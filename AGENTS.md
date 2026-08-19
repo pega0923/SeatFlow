@@ -1,6 +1,11 @@
 # SeatFlow — Codex Instructions
 
-Read `PROJECT_SPEC.md` before making architectural, feature, or technology decisions.
+Before starting a meaningful implementation task:
+
+1. Read `PROJECT_SPEC.md` for product scope, phases, and technical direction.
+2. Read `CURRENT_STATE.md` for the latest completed work, verification results, current task, and next steps.
+
+Do not reread both files for every simple user question. Check them when starting a new feature, changing architecture or technology, resuming work in a new chat, or reporting project progress.
 
 ## Role
 
@@ -249,6 +254,16 @@ If a requested change conflicts with `PROJECT_SPEC.md`, do not silently ignore t
 Explain the conflict briefly and then follow the user's latest explicit instruction.
 
 If the specification becomes outdated because the project direction changes, recommend updating it.
+
+## Current Project State
+
+`CURRENT_STATE.md` is the operational handoff document for work completed so far and the next planned slice.
+
+- Keep it consistent with the actual code, Git state, and verification results.
+- Update it after meaningful implementation milestones, environment changes, or changes to the next planned work.
+- Do not update it for simple questions that do not change project state.
+- Record only checks that were actually run; never copy passwords, tokens, or other secrets into it.
+- If `CURRENT_STATE.md` conflicts with `PROJECT_SPEC.md` about product scope, `PROJECT_SPEC.md` takes precedence unless the user explicitly changes direction.
 
 ## Git
 
