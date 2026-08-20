@@ -6,10 +6,10 @@ This file is the handoff document for continuing SeatFlow in a new chat. Read `P
 
 ## Current Position
 
-- Current phase: **Phase 0 — development environment and project creation**
-- Phase 0 status: **Functionally complete; milestone commit/push pending user approval**
-- Current focus: Record the completed Phase 0 milestone and prepare the Phase 1 vertical slice.
-- Next phase: **Phase 1 — SeatFlow v0 (`GET /api/seats`)**
+- Current phase: **Phase 1 — SeatFlow v0 (`GET /api/seats`)**
+- Phase 0 status: **Complete and pushed**
+- Phase 1 status: **Implemented and covered by an H2 API integration test; real MySQL endpoint verification pending**
+- Current focus: Apply the explicit Phase 1 schema/seed SQL to local MySQL, then start the application and call `GET /api/seats` directly.
 
 The local `seatflow` database and dedicated application account have been created. The user successfully started the application against MySQL using an environment-supplied password. No credential was shared with Codex or stored in tracked files.
 
@@ -42,6 +42,7 @@ The local `seatflow` database and dedicated application account have been create
 - Remote: `origin` → `https://github.com/pega0923/SeatFlow.git`
 - `main` tracks `origin/main`.
 - Initial project commit: `de7be9c chore: initialize Spring Boot project`
+- Phase 0 completion commit: `52feebd chore: complete local MySQL configuration`
 
 ### Spring Boot project skeleton
 
@@ -78,6 +79,17 @@ H2 is test-only. MySQL remains the required development and production database.
 - Open Session in View is disabled and Hibernate schema handling is set to `validate`; schema changes will remain explicit as entities are introduced.
 - The local `seatflow` database and `seatflow_app` account have been created.
 
+### Phase 1 seat listing implementation
+
+- `Seat` maps the initial seat fields to the `seats` table.
+- `SeatStatus` currently distinguishes operationally available and unavailable seats.
+- `SeatRepository` reads seats ordered by seat number.
+- `SeatService` owns the read-only transaction and maps entities to API response DTOs.
+- `SeatController` exposes `GET /api/seats`.
+- `SeatResponse` prevents the persistence entity from becoming the public API contract.
+- `database/phase1-seat-schema.sql` explicitly creates the MySQL table and inserts three repeatable sample rows.
+- `SeatControllerTest` verifies the Controller → Service → Repository → H2 → JSON flow.
+
 ## Verification Evidence
 
 The following checks were actually run successfully:
@@ -104,6 +116,15 @@ gradlew.bat test
 gradlew.bat build
 → BUILD SUCCESSFUL
 → Executable JAR generated at build/libs/seatflow-0.0.1-SNAPSHOT.jar
+
+After implementing `GET /api/seats`:
+
+gradlew.bat test
+→ BUILD SUCCESSFUL
+
+gradlew.bat build
+→ BUILD SUCCESSFUL
+→ `SeatControllerTest` passed using H2 in MySQL compatibility mode
 
 After adding the environment-variable-based MySQL configuration:
 
@@ -132,6 +153,8 @@ The real MySQL startup verification was performed directly by the user so the da
 - Supply local application database credentials through environment variables; do not place the real password in tracked configuration.
 - Use `spring.jpa.hibernate.ddl-auto=validate` so the application checks the schema instead of silently changing it.
 - Disable Open Session in View so database access remains within explicit application-layer operations.
+- Return `SeatResponse` DTOs rather than exposing JPA entities directly through the API.
+- Keep schema creation explicit in a versioned SQL file; the runtime application account retains CRUD-only privileges and Hibernate continues to validate rather than modify the schema.
 - Do not add Security, JWT, Redis, Docker, Swagger/OpenAPI, or later-phase features yet.
 - IntelliJ project files, Gradle caches, and build outputs are ignored by Git.
 
@@ -146,7 +169,7 @@ The real MySQL startup verification was performed directly by the user so the da
 - [x] Start the application against MySQL.
 - [x] Verify the real database connection.
 - [x] Re-run the automated tests and full Gradle build.
-- [ ] Commit and push the completed Phase 0 slice.
+- [x] Commit and push the completed Phase 0 slice.
 
 ### 2. Start Phase 1 only after Phase 0 is verified
 
@@ -169,15 +192,15 @@ Client
 
 Phase 1 initial scope:
 
-- [ ] Create the minimum `Seat` entity required by the specification.
-- [ ] Create `SeatRepository`.
-- [ ] Create `SeatService`.
-- [ ] Create `SeatController`.
-- [ ] Add minimal seed/test data only if needed to verify the endpoint.
-- [ ] Test repository/service/API behavior at an appropriate level.
+- [x] Create the minimum `Seat` entity required by the specification.
+- [x] Create `SeatRepository`.
+- [x] Create `SeatService`.
+- [x] Create `SeatController`.
+- [x] Add minimal seed/test data only if needed to verify the endpoint.
+- [x] Test repository/service/API behavior at an appropriate level.
 - [ ] Run the application and call `GET /api/seats` directly.
-- [ ] Build and run all tests.
-- [ ] Explain the request flow and the concepts the user must understand.
+- [x] Build and run all tests.
+- [x] Explain the request flow and the concepts the user must understand.
 - [ ] Commit and push the Phase 1 slice.
 
 Do not add reservations, users, authentication, Redis, Docker, lottery logic, recurring reservations, reviews, waiting lists, or statistics during this slice.
